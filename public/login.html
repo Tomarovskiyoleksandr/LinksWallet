@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="./css/auth.css">
+</head>
+<body>
+
+    <main class="auth-page">
+        <section class="auth-card">
+            <a class="auth-logo" href="/">LinksWallet</a>
+
+            <div class="auth-head">
+                <h1>Вход</h1>
+                <p>Вернитесь к своим доскам и сохраненным ссылкам.</p>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <label>
+                    <span>Email</span>
+                    <input type="email" name="email" id="email" placeholder="you@example.com" maxlength="255" autocomplete="email" required>
+                </label>
+
+                <label>
+                    <span>Пароль</span>
+                    <input type="password" name="password" id="password" placeholder="Введите пароль" minlength="8" maxlength="128" autocomplete="current-password" required>
+                </label>
+
+                <p class="auth-message" id="authMessage"></p>
+
+                <button type="submit">Войти</button>
+            </form>
+
+            <p class="auth-switch">
+                Нет аккаунта?
+                <a href="/register">Зарегистрироваться</a>
+            </p>
+        </section>
+    </main>
+
+    <script src="./js/login.js"></script>
+
+</body>
+</html>

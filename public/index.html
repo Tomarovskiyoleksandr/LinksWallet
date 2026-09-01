@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+<body>
+    <section class="section__left">
+        <div class="left__block">
+            LinksWallet 
+        </div>
+        <div class="left__block menu">
+            <form id="boards">
+                <label>
+                    Добавить папаку:
+                    <input type="text" name="addB" id="addBoard">
+                    <button type="submit"> + </button>
+                </label>
+
+                <div id="selectBoards">
+                 
+                </div>
+            </form>
+        </div>
+        <div class="left__block info" >
+            <div class="info__block">
+                <span>INFO</span>
+                <p>Храни свои ссылки в порядке и всегда под рукой.</p>
+            </div>
+        </div>
+        <div class="left__block theme">
+            <button type="button" id="themeToggle" aria-pressed="false">Светлая тема</button>
+        </div>
+    </section>
+    <section class="section__right">
+        <div class="right__block head">
+            <div>
+                <h1>Привет, <span id="usernameRender"></span>!</h1>
+                <p>Здесь хранятся все твои ссылки</p>
+            </div>
+            <button type="button" id="username" aria-expanded="false" aria-controls="profileMenu">
+                ##########
+            </button>
+            <div class="drop__menu" id="profileMenu">
+                <ul>
+                    <li class="ua"><a href="#">О проекте</a></li>
+                    <li class="ua"><a href="#">Конфиденциальность</a></li>
+                    <li data-auth="guest"><a href="/login">Вход</a></li>
+                    <li data-auth="guest"><a href="/register">Регистрация</a></li>
+                    <li data-auth="user"><a href="#" id="logoutLink">Выход</a></li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="right__block add__link">
+            <div>
+                <form id="addLink">
+                    <label>
+                        <input type="text" name="link" id="inpunL" placeholder="Ссылка...">
+                        <input type="text" name="header" id="inpunH" placeholder="Заголовок...">
+                        <button type="submit">добавить</button>
+                    </label>
+                </form>
+            </div>
+        </div>
+        <div class="right__block links">
+            <div class="head__links">
+                <div>
+                    <h3>Мои ссылки</h3>
+                </div>
+                <div class="links-view-controls">
+                    <!-- СЕТКА ССЫЛОК -->
+                    <button type="button" class="links-view-btn" data-view="list" title="Полный вид" aria-label="Полный вид">
+                        <img src="./img/Сетка(полная).png" alt="">
+                    </button>
+                    <button type="button" class="links-view-btn" data-view="medium" title="Средняя сетка" aria-label="Средняя сетка">
+                        <img src="./img/Сетка(средняя).png" alt="">
+                    </button>
+                    <button type="button" class="links-view-btn" data-view="small" title="Маленькая сетка" aria-label="Маленькая сетка">
+                        <img src="./img/Сетка(маленькая).png" alt="">
+                    </button>
+                </div>
+            </div>
+            <div class="links__container">
+
+            </div>
+        </div>
+    </section>
+    <script src="./js/profile.js"></script>
+</body>
+</html>
