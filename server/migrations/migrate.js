@@ -3,16 +3,14 @@ require("dotenv").config();
 const { Client } = require("pg");
 
 const migrations = [
-    require("./001_initial")
+    require("./001_initial"),
+  require("./002_create_tables")   
 ];
 
 async function migrate() {
 
     const client = new Client({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-            rejectUnauthorized: false
-        }
+        connectionString: process.env.DATABASE_URL,       
     });
 
     await client.connect();

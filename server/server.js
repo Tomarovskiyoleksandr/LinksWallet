@@ -40,7 +40,8 @@ const PORT = process.env.PORT || 3000;
 app.use(session({
     store: new pgSession({
         pool: pool,
-        tableName: "user_sessions"
+        tableName: "user_sessions",
+	createTableIfMissing: true
     }),
 
     secret: process.env.SESSION_SECRET,
