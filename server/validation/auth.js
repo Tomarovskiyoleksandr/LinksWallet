@@ -12,7 +12,9 @@ const registerSchema = z.object({
         .trim()
         .email()
         .max(255)
-        .transform(value => value.toLowerCase())
+        .transform(value => value.toLowerCase()),
+
+    password: z.string().min(10).max(128)
 });
 
 const loginSchema = z.object({
@@ -21,7 +23,9 @@ const loginSchema = z.object({
         .trim()
         .email()
         .max(255)
-        .transform(value => value.toLowerCase())
+        .transform(value => value.toLowerCase()),
+
+    password: z.string().min(1).max(128)
 })
 
 const emailCodeSchema = z.object({

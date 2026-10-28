@@ -50,8 +50,11 @@ async function consumeCode(pool, userId, purpose, code) {
     const supplied = Buffer.from(hash(`${userId}:${purpose}:${String(code).trim()}`), "hex");
     const expected = Buffer.from(row.code_hash, "hex");
     const valid = supplied.length === expected.length && crypto.timingSafeEqual(supplied, expected);
-    await pool.query(valid ? "UPDATE email_auth_codes SET used_at = CURRENT_TIMESTAMP WHERE id = $1" : "UPDATE email_auth_codes SET attempts = attempts + 1 WHERE id = $1", [row.id]);
-    return valid;
+    const update = await pool.query(valid
+        ? "UPDATE email_auth_codes SET used_at = CURRENT_TIMESTAMP WHERE id = $1 AND used_at IS NULL AND attempts < 5 RETURNING id"
+        : "UPDATE email_auth_codes SET attempts = attempts + 1 WHERE id = $1 AND used_at IS NULL AND attempts < 5 RETURNING id",
+    [row.id]);
+    return valid && update.rows.length === 1;
 }
 
 module.exports = { issueCode, consumeCode, generateDeviceToken, hash, hashUserAgent, DEVICE_TTL_DAYS };

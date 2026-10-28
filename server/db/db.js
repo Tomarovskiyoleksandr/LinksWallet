@@ -16,8 +16,13 @@ pool.ready = config.mock ? (async () => {
     await require("../migrations/004_two_factor_auth").up(pool);
     await require("../migrations/005_email_verification").up(pool);
     await require("../migrations/006_security_hardening").up(pool);
-    await pool.query("INSERT INTO users (username, email) VALUES ($1, $2)",
-        ["Дизайнер", "demo@example.com"]);
+    const passwordHash = await require("argon2").hash("demo12345", {
+        type: require("argon2").argon2id,
+        memoryCost: 4096,
+        timeCost: 1
+    });
+    await pool.query("INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3)",
+        ["Дизайнер", "demo@example.com", passwordHash]);
     await pool.query("INSERT INTO boards (user_id, name) VALUES (1, 'Вдохновение'), (1, 'Разработка'), (1, 'Пустая доска')");
     await pool.query(`INSERT INTO links (board_id, title, url) VALUES
         (1, 'Коллекция интерфейсов', 'https://example.com/interfaces'),

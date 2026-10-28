@@ -1,6 +1,7 @@
 const form = document.querySelector('#loginForm');
 const codeForm = document.querySelector('#codeForm');
 const emailInput = document.querySelector('#email');
+const passwordInput = document.querySelector('#password');
 const authMessage = document.querySelector('#authMessage');
 const codeMessage = document.querySelector('#codeMessage');
 const codeValue = document.querySelector('#twoFactorCode');
@@ -33,10 +34,11 @@ otpInputs.forEach((input, index) => {
 codeForm.addEventListener('submit', event => { event.preventDefault(); verifyCode(); });
 form.addEventListener('submit', async event => {
     event.preventDefault(); authMessage.textContent = '';
-    const email = emailInput.value.trim(); const error = validateEmail(email);
+    const email = emailInput.value.trim(); const password = passwordInput.value; const error = validateEmail(email);
     if (error) { authMessage.textContent = error; return; }
     try {
-        const data = await readJson(await fetch('/login-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) }));
+        const data = await readJson(await fetch('/login-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) }));
+        if (data.authenticated) { window.location.href = '/app'; return; }
         verificationPurpose = data.requiresEmailVerification ? 'register' : 'login';
         document.querySelector('#codeEmail').textContent = email;
         document.querySelector('#loginCard').hidden = true;

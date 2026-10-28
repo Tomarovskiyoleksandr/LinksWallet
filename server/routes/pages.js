@@ -1,6 +1,8 @@
 
 const express = require("express");
 const path = require("path");
+const argon2 = require("argon2");
+const config = require("../config");
 
 const pool = require("../db/db");
 
@@ -15,7 +17,7 @@ const {
     loginSchema,
     emailCodeSchema
 } = require("../validation/auth");
-const { issueCode, consumeCode } = require("../security/emailAuth");
+const { issueCode, consumeCode, generateDeviceToken, hash, hashUserAgent, DEVICE_TTL_DAYS } = require("../security/emailAuth");
 
 const { boardSchema } = require("../validation/boards");
 
@@ -34,6 +36,28 @@ const router = express.Router();
 const publicPath = path.join(__dirname, "../../public");
 const regenerateSession = req => new Promise((resolve, reject) => req.session.regenerate(error => error ? reject(error) : resolve()));
 const saveSession = req => new Promise((resolve, reject) => req.session.save(error => error ? reject(error) : resolve()));
+const DEVICE_COOKIE = "linkswallet.device";
+const cookieValue = (req, name) => {
+    const entry = (req.get("cookie") || "").split(";").map(item => item.trim()).find(item => item.startsWith(`${name}=`));
+    return entry ? decodeURIComponent(entry.slice(name.length + 1)) : null;
+};
+async function trustedDevice(req, userId) {
+    const token = cookieValue(req, DEVICE_COOKIE);
+    if (!token) return false;
+    const result = await pool.query(
+        "SELECT id, expires_at FROM trusted_login_devices WHERE user_id = $1 AND token_hash = $2 AND user_agent_hash = $3",
+        [userId, hash(token), hashUserAgent(req)]
+    );
+    return result.rows.length > 0 && new Date(result.rows[0].expires_at) > new Date();
+}
+async function rememberDevice(req, res, userId) {
+    const token = generateDeviceToken();
+    await pool.query(
+        "INSERT INTO trusted_login_devices (user_id, token_hash, user_agent_hash, expires_at) VALUES ($1, $2, $3, CURRENT_TIMESTAMP + INTERVAL '30 days')",
+        [userId, hash(token), hashUserAgent(req)]
+    );
+    res.cookie(DEVICE_COOKIE, token, { httpOnly: true, secure: config.production, sameSite: "lax", maxAge: DEVICE_TTL_DAYS * 86400000, path: "/" });
+}
 
 
 // ==========================================
@@ -76,27 +100,35 @@ router.post(
     validate(registerSchema),
     asyncHandler(async (req, res) => {
 
-        const { username, email } = req.body;
+        const { username, email, password } = req.body;
 
-        const existingUser = await pool.query(
-            "SELECT id FROM users WHERE email = $1",
-            [email]
-        );
-
-        if (existingUser.rows.length > 0) {
-            return res.status(409).json({
-                message: "Пользователь уже существует"
-            });
+        const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
+        const client = await pool.connect();
+        let user;
+        try {
+            await client.query("BEGIN");
+            const existingUser = await client.query("SELECT id FROM users WHERE LOWER(email) = $1", [email]);
+            if (existingUser.rows.length) {
+                await client.query("ROLLBACK");
+                return res.status(409).json({ message: "Пользователь уже существует" });
+            }
+            const result = await client.query(
+                `INSERT INTO users (username, email, password_hash, email_verified)
+                 VALUES ($1, $2, $3, FALSE)
+                 RETURNING id, username, email`,
+                [username, email, passwordHash]
+            );
+            user = result.rows[0];
+            await issueCode(client, user.id, email, "register");
+            await client.query("COMMIT");
+        } catch (error) {
+            await client.query("ROLLBACK").catch(() => {});
+            if (error.code === "23505") return res.status(409).json({ message: "Пользователь уже существует" });
+            throw error;
+        } finally {
+            client.release();
         }
-
-        const result = await pool.query(
-            `INSERT INTO users (username, email, email_verified)
-             VALUES ($1, $2, FALSE)
-             RETURNING id, username, email`,
-            [username, email]
-        );
-        await issueCode(pool, result.rows[0].id, email, "register");
-        req.session.pendingRegisterUserId = result.rows[0].id;
+        req.session.pendingRegisterUserId = user.id;
         await saveSession(req);
         res.status(201).json({
             message: "Код подтверждения отправлен на почту",
@@ -125,7 +157,7 @@ router.post(
     validate(loginSchema),
     asyncHandler(async (req, res) => {
 
-        const { email } = req.body;
+        const { email, password } = req.body;
 
         const result = await pool.query(
             "SELECT * FROM users WHERE email = $1",
@@ -139,6 +171,9 @@ router.post(
         }
 
         const user = result.rows[0];
+        if (!(await argon2.verify(user.password_hash, password))) {
+            return res.status(401).json({ message: "Неверный email или пароль" });
+        }
 
         if (!user.email_verified) {
             await issueCode(pool, user.id, user.email, "register");
@@ -146,6 +181,12 @@ router.post(
             req.session.pendingRegisterUserId = user.id;
             await saveSession(req);
             return res.json({ requiresEmailVerification: true });
+        }
+        if (await trustedDevice(req, user.id)) {
+            await regenerateSession(req);
+            req.session.userId = user.id;
+            await saveSession(req);
+            return res.json({ authenticated: true });
         }
         await issueCode(pool, user.id, user.email, "login");
         await regenerateSession(req);
@@ -160,6 +201,7 @@ router.post("/verify-registration", authLimiter, validate(emailCodeSchema), asyn
     if (!userId) return res.status(401).json({ message: "Сначала зарегистрируйтесь или войдите" });
     if (!(await consumeCode(pool, userId, "register", req.body.code))) return res.status(401).json({ message: "Неверный или просроченный код" });
     await pool.query("UPDATE users SET email_verified = TRUE WHERE id = $1", [userId]);
+    await rememberDevice(req, res, userId);
     await regenerateSession(req);
     req.session.userId = userId;
     await saveSession(req);
@@ -170,10 +212,18 @@ router.post("/login-email-code", authLimiter, validate(emailCodeSchema), asyncHa
     const userId = req.session.pendingLoginUserId;
     if (!userId) return res.status(401).json({ message: "Сначала введите email" });
     if (!(await consumeCode(pool, userId, "login", req.body.code))) return res.status(401).json({ message: "Неверный или просроченный код" });
+    await rememberDevice(req, res, userId);
     await regenerateSession(req);
     req.session.userId = userId;
     await saveSession(req);
     res.json({ message: "Успешный вход" });
+}));
+
+router.post("/trusted-devices/revoke-current", requireAuth, asyncHandler(async (req, res) => {
+    const token = cookieValue(req, DEVICE_COOKIE);
+    if (token) await pool.query("DELETE FROM trusted_login_devices WHERE user_id = $1 AND token_hash = $2", [req.session.userId, hash(token)]);
+    res.clearCookie(DEVICE_COOKIE, { path: "/" });
+    res.json({ message: "Доверие к устройству отозвано" });
 }));
 
 // LOGOUT

@@ -14,7 +14,7 @@
 
             <div class="auth-head">
                 <h1>Вход</h1>
-                <p>Введите email — мы пришлём одноразовый код для входа.</p>
+                <p>Введите email и пароль. Для нового устройства мы пришлём код подтверждения.</p>
             </div>
 
             <form id="loginForm" class="auth-form">
@@ -23,9 +23,14 @@
                     <input type="email" name="email" id="email" placeholder="Введите ваш email" maxlength="255" autocomplete="email" required>
                 </label>
 
+                <label>
+                    <span>Пароль</span>
+                    <input type="password" name="password" id="password" placeholder="Введите пароль" maxlength="128" autocomplete="current-password" required>
+                </label>
+
                 <p class="auth-message" id="authMessage" role="alert"></p>
 
-                <button type="submit">Получить код</button>
+                <button type="submit">Войти</button>
             </form>
 
             <p class="auth-switch">

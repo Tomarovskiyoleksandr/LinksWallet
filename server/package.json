@@ -11,13 +11,15 @@
     "dev": "nodemon --watch . --ext js,json --ignore test/ server.js",
     "dev:mock": "nodemon --watch . --ext js,json --ignore test/ local.js",
     "migrate": "node migrations/migrate.js",
-    "test:server": "node --test test/local.test.js"
+    "test:server": "node --test test/local.test.js",
+    "test:postgres-migration": "node --test test/postgres-migration.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "argon2": "^0.45.1",
     "connect-pg-simple": "^10.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",

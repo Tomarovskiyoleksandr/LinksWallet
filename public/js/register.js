@@ -2,6 +2,7 @@ const form = document.querySelector('#registerForm');
 const codeForm = document.querySelector('#codeForm');
 const usernameInput = document.querySelector('#username');
 const emailInput = document.querySelector('#email');
+const passwordInput = document.querySelector('#password');
 const authMessage = document.querySelector('#authMessage');
 const codeMessage = document.querySelector('#codeMessage');
 const codeValue = document.querySelector('#verificationCode');
@@ -9,7 +10,7 @@ const otpInputs = [...document.querySelectorAll('[data-otp] input')];
 let submittingCode = false;
 
 async function readJson(response) { const data = await response.json(); if (!response.ok) throw new Error(data.message || 'Не удалось выполнить действие'); return data; }
-function validate(username, email) { if (username.length < 3 || username.length > 30) return 'Имя должно содержать от 3 до 30 символов'; return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Введите корректный email'; }
+function validate(username, email, password) { if (username.length < 3 || username.length > 30) return 'Имя должно содержать от 3 до 30 символов'; if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Введите корректный email'; return password.length >= 10 ? '' : 'Пароль должен содержать не менее 10 символов'; }
 function clearCode() { otpInputs.forEach(input => input.value = ''); codeValue.value = ''; otpInputs[0].focus(); }
 async function verifyCode() {
     if (submittingCode || codeValue.value.length !== 6) return;
@@ -26,10 +27,10 @@ otpInputs.forEach((input, index) => {
 codeForm.addEventListener('submit', event => { event.preventDefault(); verifyCode(); });
 form.addEventListener('submit', async event => {
     event.preventDefault(); authMessage.textContent = '';
-    const username = usernameInput.value.trim(); const email = emailInput.value.trim(); const error = validate(username, email);
+    const username = usernameInput.value.trim(); const email = emailInput.value.trim(); const password = passwordInput.value; const error = validate(username, email, password);
     if (error) { authMessage.textContent = error; return; }
     try {
-        await readJson(await fetch('/register-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, email }) }));
+        await readJson(await fetch('/register-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, email, password }) }));
         document.querySelector('#codeEmail').textContent = email;
         document.querySelector('#registerCard').hidden = true;
         document.querySelector('#codeCard').hidden = false;

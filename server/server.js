@@ -62,6 +62,14 @@ app.use(express.json({
     limit: "10kb"
 }));
 
+app.use((req, res, next) => {
+    if (!config.production || !["POST", "PUT", "PATCH", "DELETE"].includes(req.method)) return next();
+    const origin = req.get("origin");
+    const expectedOrigin = `${req.protocol}://${req.get("host")}`;
+    if (origin !== expectedOrigin) return res.status(403).json({ message: "Недопустимый источник запроса" });
+    next();
+});
+
 // Статические файлы
 app.use(express.static(path.join(__dirname, "../public"), {
     etag: true,
