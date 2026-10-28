@@ -1,42 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Вход — LinksWallet</title>
     <link rel="stylesheet" href="./css/auth.css">
-</head>
-<body>
+<link rel="stylesheet" href="/css/design.css"></head>
+<body class="auth-layout">
 
     <main class="auth-page">
-        <section class="auth-card">
-            <a class="auth-logo" href="/">LinksWallet</a>
+        <section class="auth-card" id="loginCard">
+            <a class="auth-logo" href="/"><img src="/img/about/link.svg" alt="">LinksWallet</a>
 
             <div class="auth-head">
                 <h1>Вход</h1>
-                <p>Вернитесь к своим доскам и сохраненным ссылкам.</p>
+                <p>Введите email — мы пришлём одноразовый код для входа.</p>
             </div>
 
             <form id="loginForm" class="auth-form">
                 <label>
                     <span>Email</span>
-                    <input type="email" name="email" id="email" placeholder="you@example.com" maxlength="255" autocomplete="email" required>
+                    <input type="email" name="email" id="email" placeholder="Введите ваш email" maxlength="255" autocomplete="email" required>
                 </label>
 
-                <label>
-                    <span>Пароль</span>
-                    <input type="password" name="password" id="password" placeholder="Введите пароль" minlength="8" maxlength="128" autocomplete="current-password" required>
-                </label>
+                <p class="auth-message" id="authMessage" role="alert"></p>
 
-                <p class="auth-message" id="authMessage"></p>
-
-                <button type="submit">Войти</button>
+                <button type="submit">Получить код</button>
             </form>
 
             <p class="auth-switch">
                 Нет аккаунта?
                 <a href="/register">Зарегистрироваться</a>
             </p>
+        </section>
+
+        <section class="auth-card code-card" id="codeCard" hidden>
+            <a class="auth-logo" href="/"><img src="/img/about/link.svg" alt="">LinksWallet</a>
+            <div class="auth-head">
+                <h1>Проверьте почту</h1>
+                <p>Введите код, отправленный на<br><strong id="codeEmail"></strong></p>
+            </div>
+            <form id="codeForm" class="auth-form">
+                <div class="otp-group" data-otp aria-label="Шестизначный код">
+                    <input inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Первая цифра"><input inputmode="numeric" maxlength="1" aria-label="Вторая цифра"><input inputmode="numeric" maxlength="1" aria-label="Третья цифра"><input inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра"><input inputmode="numeric" maxlength="1" aria-label="Пятая цифра"><input inputmode="numeric" maxlength="1" aria-label="Шестая цифра">
+                </div>
+                <input type="hidden" id="twoFactorCode">
+                <p class="auth-message" id="codeMessage" role="alert"></p>
+            </form>
+            <p class="code-help">Не нашли письмо? Проверьте папку «Спам».</p>
         </section>
     </main>
 

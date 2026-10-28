@@ -1,47 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>Регистрация — LinksWallet</title>
     <link rel="stylesheet" href="./css/auth.css">
-</head>
-<body>
+<link rel="stylesheet" href="/css/design.css"></head>
+<body class="auth-layout">
 
     <main class="auth-page">
-        <section class="auth-card">
-            <a class="auth-logo" href="/">LinksWallet</a>
+        <section class="auth-card" id="registerCard">
+            <a class="auth-logo" href="/"><img src="/img/about/link.svg" alt="">LinksWallet</a>
 
             <div class="auth-head">
                 <h1>Регистрация</h1>
-                <p>Создайте аккаунт, чтобы хранить ссылки по доскам и быстро находить нужное.</p>
+                <p>Введите данные, чтобы создать аккаунт.</p>
             </div>
 
             <form id="registerForm" class="auth-form">
                 <label>
-                    <span>Имя пользователя</span>
-                    <input type="text" name="username" id="username" placeholder="Ваше имя" minlength="3" maxlength="30" autocomplete="username" required>
+                    <span>Полное имя</span>
+                    <input type="text" name="username" id="username" placeholder="Введите ваше имя" minlength="3" maxlength="30" autocomplete="name" required>
                 </label>
 
                 <label>
                     <span>Email</span>
-                    <input type="email" name="email" id="email" placeholder="you@example.com" maxlength="255" autocomplete="email" required>
+                    <input type="email" name="email" id="email" placeholder="Введите ваш email" maxlength="255" autocomplete="email" required>
                 </label>
 
-                <label>
-                    <span>Пароль</span>
-                    <input type="password" name="password" id="password" placeholder="Придумайте пароль" minlength="8" maxlength="128" autocomplete="new-password" required>
-                </label>
+                <p class="auth-message" id="authMessage" role="alert"></p>
 
-                <p class="auth-message" id="authMessage"></p>
-
-                <button type="submit">Создать аккаунт</button>
+                <button type="submit">Отправить код на почту</button>
             </form>
 
             <p class="auth-switch">
                 Уже есть аккаунт?
                 <a href="/login">Войти</a>
             </p>
+        </section>
+
+        <section class="auth-card code-card" id="codeCard" hidden>
+            <a class="auth-logo" href="/"><img src="/img/about/link.svg" alt="">LinksWallet</a>
+            <div class="auth-head">
+                <h1>Проверьте почту</h1>
+                <p>Введите код, отправленный на<br><strong id="codeEmail"></strong></p>
+            </div>
+            <form id="codeForm" class="auth-form">
+                <div class="otp-group" data-otp aria-label="Шестизначный код">
+                    <input inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Первая цифра"><input inputmode="numeric" maxlength="1" aria-label="Вторая цифра"><input inputmode="numeric" maxlength="1" aria-label="Третья цифра"><input inputmode="numeric" maxlength="1" aria-label="Четвёртая цифра"><input inputmode="numeric" maxlength="1" aria-label="Пятая цифра"><input inputmode="numeric" maxlength="1" aria-label="Шестая цифра">
+                </div>
+                <input type="hidden" id="verificationCode">
+                <p class="auth-message" id="codeMessage" role="alert"></p>
+            </form>
+            <p class="code-help">Не нашли письмо? Проверьте папку «Спам».</p>
         </section>
     </main>
 

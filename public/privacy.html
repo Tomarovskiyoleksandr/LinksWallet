@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конфиденциальность — LinksWallet</title>
+    <meta name="description" content="Какие данные хранит LinksWallet, как защищает аккаунт и как управлять сохранёнными ссылками.">
+    <link rel="stylesheet" href="/css/about.css">
+    <link rel="stylesheet" href="/css/privacy.css">
+    <script src="/js/about.js" defer></script>
+<link rel="stylesheet" href="/css/design.css"></head>
+<body class="info-page">
+    <a class="skip-link" href="#content">К содержимому</a>
+    <div class="page-shell">
+        <header class="site-header">
+            <a class="brand" href="/" aria-label="LinksWallet — на главную"><span class="icon brand-icon" aria-hidden="true"><img src="/img/about/link.svg" alt=""></span>LinksWallet</a>
+            <nav class="site-nav" aria-label="О сервисе"><a href="/about">О проекте</a><a href="/privacy" aria-current="page">Конфиденциальность</a></nav>
+            <a class="account-link" href="/login" data-account-link>Войти</a>
+        </header>
+        <main id="content" class="about-content privacy-content">
+            <h1>Конфиденциальность</h1>
+            <p class="lead">Мы уважаем вашу приватность и заботимся о защите ваших данных.</p>
+            <div class="privacy-sections">
+                <section class="privacy-item" aria-labelledby="data-title">
+                    <span class="privacy-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 12h8M8 16h8M8 8h2"/></svg></span>
+                    <div><h2 id="data-title">Какие данные мы собираем</h2><p>Мы храним имя пользователя, email и хеш пароля, а также названия папок, заголовки и адреса сохранённых ссылок.</p></div>
+                </section>
+                <section class="privacy-item" aria-labelledby="use-title">
+                    <span class="privacy-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 3 7v6c0 5 9 9 9 9s9-4 9-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span>
+                    <div><h2 id="use-title">Как мы используем данные</h2><p>Данные нужны для входа в аккаунт, хранения и организации ваших ссылок. Доступ к папкам и ссылкам в приложении есть только у владельца аккаунта.</p></div>
+                </section>
+                <section class="privacy-item" aria-labelledby="security-title">
+                    <span class="privacy-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="12" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4M12 15v3"/></svg></span>
+                    <div><h2 id="security-title">Безопасность</h2><p>Вход выполняется по одноразовым кодам с ограниченным сроком действия и числом попыток. Коды хранятся только в виде криптографических хешей, а cookie входа недоступен для чтения скриптами страницы.</p></div>
+                </section>
+                <section class="privacy-item" aria-labelledby="rights-title">
+                    <span class="privacy-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v3"/></svg></span>
+                    <div><h2 id="rights-title">Ваши права</h2><p>Вы можете изменять и удалять свои ссылки и папки в разделе <a href="/app">«Мои ссылки»</a>. Удаление аккаунта через интерфейс пока недоступно.</p></div>
+                </section>
+            </div>
+            <details class="privacy-details">
+                <summary>Подробнее о хранении данных и внешних сервисах</summary>
+                <div class="privacy-details-body">
+                    <h2>Cookie и настройки</h2>
+                    <p>Cookie сохраняет вход на срок до семи дней. При выходе сессия удаляется. Тема оформления и вид карточек сохраняются в локальном хранилище браузера; их можно удалить через настройки браузера.</p>
+                    <h2>Значки сайтов и внешние ссылки</h2>
+                    <p>При переходе по сохранённой ссылке действуют правила конфиденциальности открываемого сайта. LinksWallet не загружает значки сайтов через сторонние сервисы.</p>
+                    <h2>Хранение и удаление</h2>
+                    <p>Ссылки и папки хранятся, пока вы их не удалите. Удаление папки также удаляет ссылки внутри неё. В локальной демоверсии данные аккаунтов, папок, ссылок и сессий сбрасываются при перезапуске сервера.</p>
+                    <h2>Дополнительная информация</h2>
+                    <p>Если к обработке ваших данных применяется GDPR, он предусматривает права на доступ, исправление и, при определённых условиях, удаление данных. Подробнее — на <a href="https://commission.europa.eu/law/law-topic/data-protection/information-individuals_en" target="_blank" rel="noopener noreferrer">сайте Европейской комиссии</a>.</p>
+                    <p class="privacy-sources">Материалы о защите данных: <a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html" target="_blank" rel="noopener noreferrer">OWASP: хранение паролей</a> и <a href="https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html" target="_blank" rel="noopener noreferrer">защита сессий</a>. Описание возможностей LinksWallet сверено с текущей версией сервиса.</p>
+                </div>
+            </details>
+            <p class="privacy-updated">Обновлено <time datetime="2026-10-04">4 октября 2026</time></p>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-const { z, email } = require("zod");
+const { z } = require("zod");
 
 const registerSchema = z.object({
     username: z
@@ -11,11 +11,8 @@ const registerSchema = z.object({
         .string()
         .trim()
         .email()
-        .max(255),
-    password: z
-        .string()
-        .min(8)
-        .max(128)
+        .max(255)
+        .transform(value => value.toLowerCase())
 });
 
 const loginSchema = z.object({
@@ -23,14 +20,17 @@ const loginSchema = z.object({
         .string()
         .trim()
         .email()
-        .max(255),
-    password: z
-        .string()
-        .min(8)
-        .max(128)
+        .max(255)
+        .transform(value => value.toLowerCase())
 })
 
+const emailCodeSchema = z.object({
+    code: z.string().trim().min(6).max(32)
+});
+
 module.exports = {
+    profileSchema: registerSchema.pick({ username: true }),
     registerSchema,
-    loginSchema
+    loginSchema,
+    emailCodeSchema
 };

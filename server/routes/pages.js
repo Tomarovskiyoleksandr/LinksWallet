@@ -1,6 +1,6 @@
+
 const express = require("express");
 const path = require("path");
-const argon2 = require("argon2");
 
 const pool = require("../db/db");
 
@@ -11,8 +11,11 @@ const authLimiter = require("../middleware/rateLimit");
 
 const {
     registerSchema,
-    loginSchema
+    profileSchema,
+    loginSchema,
+    emailCodeSchema
 } = require("../validation/auth");
+const { issueCode, consumeCode } = require("../security/emailAuth");
 
 const { boardSchema } = require("../validation/boards");
 
@@ -29,6 +32,8 @@ const {
 const router = express.Router();
 
 const publicPath = path.join(__dirname, "../../public");
+const regenerateSession = req => new Promise((resolve, reject) => req.session.regenerate(error => error ? reject(error) : resolve()));
+const saveSession = req => new Promise((resolve, reject) => req.session.save(error => error ? reject(error) : resolve()));
 
 
 // ==========================================
@@ -39,12 +44,24 @@ router.get("/", (req, res) => {
     res.sendFile(path.join(publicPath, "index.html"));
 });
 
+router.get("/app", (req, res) => {
+    res.sendFile(path.join(publicPath, "app.html"));
+});
+
 router.get("/login", (req, res) => {
     res.sendFile(path.join(publicPath, "login.html"));
 });
 
 router.get("/register", (req, res) => {
     res.sendFile(path.join(publicPath, "register.html"));
+});
+
+router.get("/about", (req, res) => {
+    res.sendFile(path.join(publicPath, "about.html"));
+});
+
+router.get("/privacy", (req, res) => {
+    res.sendFile(path.join(publicPath, "privacy.html"));
 });
 
 // ==========================================
@@ -59,7 +76,7 @@ router.post(
     validate(registerSchema),
     asyncHandler(async (req, res) => {
 
-        const { username, email, password } = req.body;
+        const { username, email } = req.body;
 
         const existingUser = await pool.query(
             "SELECT id FROM users WHERE email = $1",
@@ -72,18 +89,18 @@ router.post(
             });
         }
 
-        const passwordHash = await argon2.hash(password);
-
         const result = await pool.query(
-            `INSERT INTO users (username, email, password_hash)
-             VALUES ($1, $2, $3)
+            `INSERT INTO users (username, email, email_verified)
+             VALUES ($1, $2, FALSE)
              RETURNING id, username, email`,
-            [username, email, passwordHash]
+            [username, email]
         );
-
+        await issueCode(pool, result.rows[0].id, email, "register");
+        req.session.pendingRegisterUserId = result.rows[0].id;
+        await saveSession(req);
         res.status(201).json({
-            message: "Пользователь создан",
-            user: result.rows[0]
+            message: "Код подтверждения отправлен на почту",
+            requiresEmailVerification: true
         });
     })
 );
@@ -108,7 +125,7 @@ router.post(
     validate(loginSchema),
     asyncHandler(async (req, res) => {
 
-        const { email, password } = req.body;
+        const { email } = req.body;
 
         const result = await pool.query(
             "SELECT * FROM users WHERE email = $1",
@@ -117,52 +134,47 @@ router.post(
 
         if (result.rows.length === 0) {
             return res.status(401).json({
-                message: "Неверный email или пароль"
+                message: "Пользователь с таким email не найден"
             });
         }
 
         const user = result.rows[0];
 
-        const validPassword = await argon2.verify(
-            user.password_hash,
-            password
-        );
-
-        if (!validPassword) {
-            return res.status(401).json({
-                message: "Неверный email или пароль"
-            });
+        if (!user.email_verified) {
+            await issueCode(pool, user.id, user.email, "register");
+            await regenerateSession(req);
+            req.session.pendingRegisterUserId = user.id;
+            await saveSession(req);
+            return res.json({ requiresEmailVerification: true });
         }
-
-        req.session.regenerate((error) => {
-
-            if (error) {
-                return res.status(500).json({
-                    message: "Ошибка сервера"
-                });
-            }
-
-            req.session.userId = user.id;
-
-            req.session.save((error) => {
-
-                if (error) {
-                    return res.status(500).json({
-                        message: "Ошибка сервера"
-                    });
-                }
-
-                res.json({
-                    message: "Успешный вход",
-                    user: {
-                        id: user.id,
-                        email: user.email
-                    }
-                });
-            });
-        });
+        await issueCode(pool, user.id, user.email, "login");
+        await regenerateSession(req);
+        req.session.pendingLoginUserId = user.id;
+        await saveSession(req);
+        res.json({ requiresEmailCode: true, message: "Код входа отправлен на почту" });
     })
 );
+
+router.post("/verify-registration", authLimiter, validate(emailCodeSchema), asyncHandler(async (req, res) => {
+    const userId = req.session.pendingRegisterUserId;
+    if (!userId) return res.status(401).json({ message: "Сначала зарегистрируйтесь или войдите" });
+    if (!(await consumeCode(pool, userId, "register", req.body.code))) return res.status(401).json({ message: "Неверный или просроченный код" });
+    await pool.query("UPDATE users SET email_verified = TRUE WHERE id = $1", [userId]);
+    await regenerateSession(req);
+    req.session.userId = userId;
+    await saveSession(req);
+    res.json({ message: "Email подтверждён" });
+}));
+
+router.post("/login-email-code", authLimiter, validate(emailCodeSchema), asyncHandler(async (req, res) => {
+    const userId = req.session.pendingLoginUserId;
+    if (!userId) return res.status(401).json({ message: "Сначала введите email" });
+    if (!(await consumeCode(pool, userId, "login", req.body.code))) return res.status(401).json({ message: "Неверный или просроченный код" });
+    await regenerateSession(req);
+    req.session.userId = userId;
+    await saveSession(req);
+    res.json({ message: "Успешный вход" });
+}));
 
 // LOGOUT
 
@@ -196,7 +208,7 @@ router.get(
     asyncHandler(async (req, res) => {
 
         const result = await pool.query(
-            `SELECT id, email, username
+            `SELECT id, email, username, created_at, email_verified
              FROM users
              WHERE id = $1`,
             [req.session.userId]
@@ -471,5 +483,14 @@ router.delete(
         });
     })
 );
+
+router.patch("/me", requireAuth, validate(profileSchema), asyncHandler(async (req, res) => {
+    const result = await pool.query(
+        "UPDATE users SET username = $1 WHERE id = $2 RETURNING id, email, username, created_at",
+        [req.body.username, req.session.userId]
+    );
+    if (!result.rows.length) return res.status(404).json({ message: "Пользователь не найден" });
+    res.json({ user: result.rows[0] });
+}));
 
 module.exports = router;

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="Figma">
+  <path fill="#f24e1e" d="M12 2H8.5a3.5 3.5 0 1 0 0 7H12V2Z"/>
+  <path fill="#ff7262" d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2Z"/>
+  <path fill="#a259ff" d="M12 9H8.5a3.5 3.5 0 1 0 0 7H12V9Z"/>
+  <circle cx="15.5" cy="12.5" r="3.5" fill="#1abcfe"/>
+  <path fill="#0acf83" d="M12 16H8.5a3.5 3.5 0 1 0 3.5 3.5V16Z"/>
+</svg>

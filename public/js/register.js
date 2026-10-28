@@ -1,121 +1,38 @@
-const registerForm = document.querySelector("#registerForm");
-const inputUsername = document.querySelector("#username");
-const inputEmail = document.querySelector("#email");
-const inputPassword = document.querySelector("#password");
-const authMessage = document.querySelector("#authMessage");
+const form = document.querySelector('#registerForm');
+const codeForm = document.querySelector('#codeForm');
+const usernameInput = document.querySelector('#username');
+const emailInput = document.querySelector('#email');
+const authMessage = document.querySelector('#authMessage');
+const codeMessage = document.querySelector('#codeMessage');
+const codeValue = document.querySelector('#verificationCode');
+const otpInputs = [...document.querySelectorAll('[data-otp] input')];
+let submittingCode = false;
 
-registerForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    authMessage.textContent = "";
-
-    const username = inputUsername.value.trim();
-    const email = inputEmail.value.trim();
-    const password = inputPassword.value;
-    const validationError = validateRegister({ username, email, password });
-
-    if (validationError) {
-        authMessage.textContent = validationError;
-        return;
-    }
-
-    try {
-        const response = await fetch("/register-user", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                username,
-                email,
-                password
-            })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            authMessage.textContent = data.message || "Не удалось создать аккаунт";
-            inputPassword.value = "";
-            return;
-        }
-
-        const loginResponse = await fetch("/login-user", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
-        });
-
-        if (!loginResponse.ok) {
-            authMessage.textContent = "Аккаунт создан. Войдите, чтобы продолжить";
-            inputPassword.value = "";
-            return;
-        }
-
-        window.location.href = "/";
-    } catch (error) {
-        authMessage.textContent = "Ошибка соединения с сервером";
-        console.log("Ошибка соединения с сервером:", error);
-    }
+async function readJson(response) { const data = await response.json(); if (!response.ok) throw new Error(data.message || 'Не удалось выполнить действие'); return data; }
+function validate(username, email) { if (username.length < 3 || username.length > 30) return 'Имя должно содержать от 3 до 30 символов'; return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Введите корректный email'; }
+function clearCode() { otpInputs.forEach(input => input.value = ''); codeValue.value = ''; otpInputs[0].focus(); }
+async function verifyCode() {
+    if (submittingCode || codeValue.value.length !== 6) return;
+    submittingCode = true; codeMessage.textContent = 'Проверяем код…';
+    try { await readJson(await fetch('/verify-registration', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: codeValue.value }) })); window.location.href = '/app'; }
+    catch (error) { codeMessage.textContent = error.message; clearCode(); }
+    finally { submittingCode = false; }
+}
+otpInputs.forEach((input, index) => {
+    input.addEventListener('input', () => { input.value = input.value.replace(/\D/g, '').slice(-1); codeValue.value = otpInputs.map(item => item.value).join(''); if (input.value) otpInputs[index + 1]?.focus(); if (codeValue.value.length === 6) verifyCode(); });
+    input.addEventListener('keydown', event => { if (event.key === 'Backspace' && !input.value) otpInputs[index - 1]?.focus(); });
+    input.addEventListener('paste', event => { const digits = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6); if (!digits) return; event.preventDefault(); otpInputs.forEach((item, i) => item.value = digits[i] || ''); codeValue.value = digits; otpInputs[Math.min(digits.length, 6) - 1].focus(); if (digits.length === 6) verifyCode(); });
 });
-
-function validateRegister({ username, email, password }) {
-    const usernameError = validateUsername(username);
-
-    if (usernameError) {
-        return usernameError;
-    }
-
-    const emailError = validateEmail(email);
-
-    if (emailError) {
-        return emailError;
-    }
-
-    return validatePassword(password);
-}
-
-function validateUsername(username) {
-    if (username.length < 3) {
-        return "Имя пользователя должно быть не короче 3 символов";
-    }
-
-    if (username.length > 30) {
-        return "Имя пользователя не должно быть длиннее 30 символов";
-    }
-
-    return "";
-}
-
-function validateEmail(email) {
-    if (!email) {
-        return "Введите email";
-    }
-
-    if (email.length > 255) {
-        return "Email не должен быть длиннее 255 символов";
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return "Введите корректный email";
-    }
-
-    return "";
-}
-
-function validatePassword(password) {
-    if (password.length < 8) {
-        return "Пароль должен быть не короче 8 символов";
-    }
-
-    if (password.length > 128) {
-        return "Пароль не должен быть длиннее 128 символов";
-    }
-
-    return "";
-}
+codeForm.addEventListener('submit', event => { event.preventDefault(); verifyCode(); });
+form.addEventListener('submit', async event => {
+    event.preventDefault(); authMessage.textContent = '';
+    const username = usernameInput.value.trim(); const email = emailInput.value.trim(); const error = validate(username, email);
+    if (error) { authMessage.textContent = error; return; }
+    try {
+        await readJson(await fetch('/register-user', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, email }) }));
+        document.querySelector('#codeEmail').textContent = email;
+        document.querySelector('#registerCard').hidden = true;
+        document.querySelector('#codeCard').hidden = false;
+        otpInputs[0].focus();
+    } catch (error) { authMessage.textContent = error.message; }
+});

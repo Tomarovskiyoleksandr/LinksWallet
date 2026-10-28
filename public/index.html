@@ -1,93 +1,51 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinksWallet</title>
-    <link rel="stylesheet" href="./css/index.css">
-</head>
-<body>
-    <section class="section__left">
-        <div class="left__block">
-            LinksWallet 
-        </div>
-        <div class="left__block menu">
-            <form id="boards">
-                <label>
-                    Добавить папаку:
-                    <input type="text" name="addB" id="addBoard">
-                    <button type="submit"> + </button>
-                </label>
-
-                <div id="selectBoards">
-                 
-                </div>
-            </form>
-        </div>
-        <div class="left__block info" >
-            <div class="info__block">
-                <span>INFO</span>
-                <p>Храни свои ссылки в порядке и всегда под рукой.</p>
-            </div>
-        </div>
-        <div class="left__block theme">
-            <button type="button" id="themeToggle" aria-pressed="false">Светлая тема</button>
-        </div>
-    </section>
-    <section class="section__right">
-        <div class="right__block head">
-            <div>
-                <h1>Привет, <span id="usernameRender"></span>!</h1>
-                <p>Здесь хранятся все твои ссылки</p>
-            </div>
-            <button type="button" id="username" aria-expanded="false" aria-controls="profileMenu">
-                ##########
-            </button>
-            <div class="drop__menu" id="profileMenu">
-                <ul>
-                    <li class="ua"><a href="#">О проекте</a></li>
-                    <li class="ua"><a href="#">Конфиденциальность</a></li>
-                    <li data-auth="guest"><a href="/login">Вход</a></li>
-                    <li data-auth="guest"><a href="/register">Регистрация</a></li>
-                    <li data-auth="user"><a href="#" id="logoutLink">Выход</a></li>
-                </ul>
-            </div>
-
-        </div>
-        <div class="right__block add__link">
-            <div>
-                <form id="addLink">
-                    <label>
-                        <input type="text" name="link" id="inpunL" placeholder="Ссылка...">
-                        <input type="text" name="header" id="inpunH" placeholder="Заголовок...">
-                        <button type="submit">добавить</button>
-                    </label>
-                </form>
-            </div>
-        </div>
-        <div class="right__block links">
-            <div class="head__links">
-                <div>
-                    <h3>Мои ссылки</h3>
-                </div>
-                <div class="links-view-controls">
-                    <!-- СЕТКА ССЫЛОК -->
-                    <button type="button" class="links-view-btn" data-view="list" title="Полный вид" aria-label="Полный вид">
-                        <img src="./img/Сетка(полная).png" alt="">
-                    </button>
-                    <button type="button" class="links-view-btn" data-view="medium" title="Средняя сетка" aria-label="Средняя сетка">
-                        <img src="./img/Сетка(средняя).png" alt="">
-                    </button>
-                    <button type="button" class="links-view-btn" data-view="small" title="Маленькая сетка" aria-label="Маленькая сетка">
-                        <img src="./img/Сетка(маленькая).png" alt="">
-                    </button>
-                </div>
-            </div>
-            <div class="links__container">
-
-            </div>
-        </div>
-    </section>
-    <script src="./js/profile.js"></script>
-</body>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="LinksWallet — сохраняйте полезные ссылки, организовывайте их по папкам и быстро находите нужное.">
+<title>LinksWallet — ваши ссылки в одном месте</title>
+<link rel="stylesheet" href="/css/landing.css"><script src="/js/landing.js" defer></script>
+<link rel="stylesheet" href="/css/design.css"></head>
+<body class="landing-page">
+<header class="landing-header">
+<a class="brand" href="/" aria-label="LinksWallet — главная"><img src="/img/about/link.svg" alt="">LinksWallet</a>
+<nav class="header-nav" aria-label="О сервисе"><a href="/about">О проекте</a><a href="/privacy">Конфиденциальность</a></nav>
+<div class="header-actions"><a class="login-button" href="/login" data-guest>Войти</a><a class="button button-small" href="/register" data-start><span data-start-label>Зарегистрироваться</span></a></div>
+</header>
+<main class="hero">
+<div class="hero-copy"><p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Ваш маленький порядок в интернете</p>
+<h1>Хорошие находки.<br><span>Всегда под рукой.</span></h1>
+<p class="hero-description">Статья на потом, идея для проекта, любимый инструмент. Соберите всё в LinksWallet — и возвращайтесь к нужному без долгих поисков.</p>
+<ul class="benefits" aria-label="Возможности сервиса">
+<li><img src="/img/about/shield-check.svg" alt=""><span>Безопасное<br>хранение</span></li>
+<li><img src="/img/about/folder.svg" alt=""><span>Удобная<br>организация</span></li>
+<li><img src="/img/about/monitor-smartphone.svg" alt=""><span>Доступ<br>всегда с вами</span></li>
+</ul>
+<div class="hero-actions"><a class="button start-button" href="/register" data-start><span data-start-label>Начать собирать</span><span aria-hidden="true">→</span></a><p data-guest>Уже есть аккаунт? <a href="/login">Войти</a></p></div>
+</div>
+<div class="hero-art" aria-label="Пример организации ссылок по папкам">
+<div class="preview-label" aria-hidden="true"><span>✓</span> У каждой находки своё место</div><div class="art-glow" aria-hidden="true"></div>
+<div class="preview" aria-hidden="true">
+<div class="preview-folders"><h2>Мои ссылки</h2><div class="preview-folder selected"><span class="folder blue"></span>Работа</div><div class="preview-folder"><span class="folder yellow"></span>Учёба</div><div class="preview-folder"><span class="folder green"></span>Личное</div></div>
+<div class="preview-links">
+<div class="preview-row"><span class="site-logo notion">N</span><div><strong>Notion</strong><span>https://www.notion.so</span></div></div>
+<div class="preview-row"><span class="site-logo github">G</span><div><strong>GitHub</strong><span>https://github.com</span></div></div>
+<div class="preview-row"><span class="site-logo figma"><img src="/img/about/figma.svg" alt=""></span><div><strong>Figma</strong><span>https://www.figma.com</span></div></div>
+<div class="preview-row"><span class="site-logo youtube">▶</span><div><strong>YouTube</strong><span>https://www.youtube.com</span></div></div>
+<div class="preview-row"><span class="site-logo mdn">M</span><div><strong>MDN Web Docs</strong><span>https://developer.mozilla.org</span></div></div>
+</div>
+</div>
+<div class="art-note" aria-hidden="true">Всё важное<br>в одном месте <svg viewBox="0 0 90 70" fill="none"><path d="M5 62C46 63 64 38 66 9M51 22L67 6L78 25" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+</div>
+</main>
+<section class="landing-section" aria-labelledby="workflow-title">
+    <div class="section-intro"><h2 id="workflow-title">Меньше открытых вкладок.<br>Больше порядка.</h2><p>Простое пространство для всего, к чему хочется вернуться. Без сложных настроек.</p></div>
+    <div class="workflow-grid">
+        <article class="workflow-card"><div class="step-number"><span>01 / СОХРАНИТЕ</span><img src="/img/about/bookmark.svg" alt=""></div><h3>Нашли полезное? Сохраните.</h3><p>Добавьте ссылку и понятное название, чтобы хорошая находка не потерялась.</p></article>
+        <article class="workflow-card"><div class="step-number"><span>02 / ОРГАНИЗУЙТЕ</span><img src="/img/about/folder.svg" alt=""></div><h3>Разложите по своим папкам.</h3><p>Работа, учёба, вдохновение. Создавайте папки под свои интересы и проекты.</p></article>
+        <article class="workflow-card"><div class="step-number"><span>03 / ВЕРНИТЕСЬ</span><img src="/img/about/search.svg" alt=""></div><h3>Нужное — в пару кликов.</h3><p>Откройте папку или найдите ссылку по названию и адресу. Продолжайте с того, что важно.</p></article>
+    </div>
+    <div class="closing-card"><div><h2>Ваша следующая находка<br>уже заслуживает места.</h2><p>Начните с одной папки. Остальное сложится.</p></div><a class="button" href="/register" data-start><span data-start-label>Создать аккаунт</span><span aria-hidden="true">↗</span></a></div>
+</section>
+<footer class="landing-footer"><span>LinksWallet · Сохраняйте то, что важно.</span><nav aria-label="Полезная информация"><a href="/about">О проекте</a><a href="/privacy">Конфиденциальность</a></nav></footer></body>
 </html>

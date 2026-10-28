@@ -1,4 +1,4 @@
-function acyncHandler(callback) {
+function asyncHandler(callback) {
     return (req, res, next) => {
         Promise
             .resolve(callback(req, res, next))
@@ -6,4 +6,4 @@ function acyncHandler(callback) {
     };
 }
 
-module.exports = acyncHandler;
+module.exports = asyncHandler;

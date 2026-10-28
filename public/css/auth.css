@@ -138,6 +138,17 @@ body {
     box-shadow: 0 0 0 4px rgba(112, 72, 255, 0.08);
 }
 
+#twoFactorCode,
+#verificationCode {
+    height: 58px;
+    background: #fff;
+    border-color: #d8dae3;
+    font-size: 24px;
+    font-weight: 750;
+    letter-spacing: 12px;
+    text-align: center;
+}
+
 .auth-message {
     min-height: 20px;
 
@@ -215,4 +226,53 @@ body {
     .auth-head h1 {
         font-size: 27px;
     }
+}
+
+/* Passwordless flow keeps the original LinksWallet visual language. */
+.auth-logo { align-items: center; gap: 9px; }
+.auth-logo img { width: 27px; height: 27px; }
+.auth-alternatives { margin-top: 20px; display: grid; gap: 10px; }
+.auth-divider { display: flex; align-items: center; gap: 12px; color: #a3a6bb; font-size: 11px; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: #e9e9f1; }
+.social-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    height: 46px;
+    border: 1px solid #e1dff0;
+    border-radius: 11px;
+    background: #fff;
+    color: #34394f;
+    font-size: 14px;
+    font-weight: 650;
+    cursor: pointer;
+}
+.social-button:hover { background: #f7f6fc; border-color: rgba(112,72,255,.3); }
+.social-button strong { width: 18px; color: #7048ff; }
+.otp-group { display: grid !important; grid-template-columns: repeat(6, 1fr); gap: 8px !important; }
+.auth-form .otp-group input {
+    min-width: 0;
+    height: 54px;
+    padding: 0;
+    background: #f7f6fc;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    color: #15182b;
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+}
+.auth-form .otp-group input:focus { background:#fff; border-color:rgba(112,72,255,.45); box-shadow:0 0 0 4px rgba(112,72,255,.08); }
+#twoFactorCode, #verificationCode { display: none; }
+.code-card { text-align: center; }
+.code-card .auth-logo { display: flex; width: max-content; margin: 0 auto 30px; }
+.code-card .auth-head { margin-bottom: 28px; }
+.code-card .auth-head strong { color: #34394f; overflow-wrap: anywhere; }
+.code-card .auth-message { margin-top: 4px; text-align: center; }
+.code-help { margin-top: 18px; color: #888da8; font-size: 13px; text-align: center; }
+.code-card .otp-group { width: 100%; }
+@media (max-width: 420px) {
+    .otp-group { gap: 5px !important; }
 }

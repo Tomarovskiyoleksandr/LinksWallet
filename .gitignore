@@ -2,3 +2,8 @@ node_modules/
 server/node_modules/
 .env
 server/.env
+.env.*
+!.env.example
+!server/.env.example
+npm-debug.log*
+.DS_Store
